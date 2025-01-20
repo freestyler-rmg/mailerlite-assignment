@@ -1,22 +1,33 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, markRaw } from 'vue';
 import TextComponent from '@/components/TextComponent.vue';
 import ImageComponent from '@/components/ImageComponent.vue';
 
-function startDrag(evt) {
+const components = {
+  text: markRaw(TextComponent),
+  image: markRaw(ImageComponent),
+};
+
+function startDrag(evt, type) {
   console.log(evt);
   evt.dataTransfer.dropEffect = 'copy';
-  evt.dataTransfer.effectAllowed = 'move';
+  evt.dataTransfer.setData('type', type);
 }
 
 function onDrop(evt) {
-  console.log(evt, 'onDrop');
+  const itemType = evt.dataTransfer.getData('type');
+  console.log(itemType);
+  items.value.push({
+    id: items.value.length,
+    type: components[itemType],
+    content: 'New Component',
+  });
 }
 
 const items = ref([
   {
     id: 0,
-    type: TextComponent,
+    type: markRaw(TextComponent),
     content: 'Hello World',
   },
 ]);
@@ -25,10 +36,10 @@ const items = ref([
 <template>
   <div class="builder-view">
     <div class="sidebar">
-      <div class="dragable-item" draggable="true" @dragstart="startDrag($event)">
+      <div class="dragable-item" draggable="true" @dragstart="startDrag($event, 'text')">
         <p>Text</p>
       </div>
-      <div class="dragable-item" draggable="true" @dragstart="startDrag($event)">
+      <div class="dragable-item" draggable="true" @dragstart="startDrag($event, 'image')">
         <p>Image</p>
       </div>
     </div>
