@@ -20,6 +20,7 @@ const items = ref<Item[]>([]);
 function startDrag(evt, type: Component) {
   evt.dataTransfer.dropEffect = 'copy';
   evt.dataTransfer.setData('type', type);
+  isSidebarShown.value = false;
 }
 
 function onDrop(evt, position: 'top' | 'bottom') {
@@ -103,11 +104,18 @@ function saveToJson() {
 
   console.log(JSON.stringify(forJson));
 }
+
+// CODE BLOCK - toggle sidebar
+const isSidebarShown = ref(false);
+
+function toggleSidebar() {
+  isSidebarShown.value = !isSidebarShown.value;
+}
 </script>
 
 <template>
   <div class="builder-view">
-    <div class="sidebar">
+    <div :class="['sidebar', { open: isSidebarShown }]">
       <div class="dragable-item" draggable="true" @dragstart="startDrag($event, 'text')">
         <p>Text</p>
       </div>
@@ -118,6 +126,8 @@ function saveToJson() {
       <div>
         <button class="small-button w-full bg-[#16a34a]" @click="saveToJson">Save</button>
       </div>
+
+      <div class="toggle-sidebar" @click="toggleSidebar">toggle sidebar</div>
     </div>
     <div class="dropzone-container">
       <div class="dropzone mb-4" @drop="onDrop($event, 'top')" @dragover.prevent @dragenter.prevent>
@@ -153,26 +163,55 @@ function saveToJson() {
 <style lang="scss">
 .builder-view {
   display: flex;
-  .sidebar {
-    width: 200px;
-    background-color: #f0f0f0;
-    padding: 10px;
-  }
 }
 
 .sidebar {
+  width: 200px;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  transform: translateX(-100%);
+  transition: transform 0.3s;
+  .toggle-sidebar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translateX(100%);
+    background-color: #333;
+    color: #fff;
+    z-index: 10;
+    font-size: 10px;
+    padding: 4px 8px;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  &.open {
+    transform: translateX(0);
+  }
   .dragable-item {
     background-color: #fff;
     padding: 10px;
     margin-bottom: 10px;
     cursor: pointer;
   }
+
+  @media (screen(md)) {
+    position: relative;
+    transform: none;
+    .toggle-sidebar {
+      display: none;
+    }
+  }
 }
 
 .dropzone-container {
   flex: 1;
-  border: 1px solid #ccc;
   padding: 16px;
+  padding-top: 32px;
   min-height: 100vh;
   .dropzone {
     width: 100%;
