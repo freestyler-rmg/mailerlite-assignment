@@ -27,26 +27,46 @@ const items = ref<Item[]>([
 
 // CODE BLOCK - drag and drop
 function startDrag(evt, type: Component) {
-  console.log(evt);
   evt.dataTransfer.dropEffect = 'copy';
   evt.dataTransfer.setData('type', type);
 }
 
-function onDrop(evt) {
+function onDrop(evt, position: 'top' | 'bottom') {
   const itemType = evt.dataTransfer.getData('type');
-  console.log(itemType);
-  items.value.push({
-    id: items.value.length,
-    type: components[itemType],
-    content: 'Hello World',
-  });
+
+  if (position === 'top') {
+    items.value.unshift({
+      id: items.value.length,
+      type: components[itemType],
+      content: itemType === 'text' ? 'Hello World' : '',
+      imageSrc: itemType === 'image' ? '/src/assets/pics/red-panda.jpg' : '',
+      imageAlt: itemType === 'image' ? 'Red Panda' : '',
+    });
+  }
+
+  if (position === 'bottom') {
+    items.value.push({
+      id: items.value.length,
+      type: components[itemType],
+      content: itemType === 'text' ? 'Hello World' : '',
+      imageSrc: itemType === 'image' ? '/src/assets/pics/red-panda.jpg' : '',
+      imageAlt: itemType === 'image' ? 'Red Panda' : '',
+    });
+  }
 }
 
 // CODE BLOCK - duplicate
-// TODO: update this to accomodate image component and better logic
 function duplicateItem(id: number) {
-  const item = items.value.find((item) => item.id === id);
-  items.value.push({ ...item, id: items.value.length });
+  let itemIndex: number | null = null;
+  const item = items.value.find((item, index) => {
+    if (item.id === id) {
+      itemIndex = index;
+      return item;
+    }
+  });
+  if (itemIndex !== null) {
+    items.value.splice(itemIndex, 0, { ...item, id: items.value.length });
+  }
 }
 
 // CODE BLOCK - delete
@@ -86,8 +106,13 @@ function pickThisImage(img: { id: number; imageSrc: string; imageAlt: string }) 
       <div class="dragable-item" draggable="true" @dragstart="startDrag($event, 'image')">
         <p>Image</p>
       </div>
+      <hr />
+      <!-- TODO: save on json -->
     </div>
     <div class="dropzone-container">
+      <div class="dropzone mb-4" @drop="onDrop($event, 'top')" @dragover.prevent @dragenter.prevent>
+        dropzone
+      </div>
       <div class="content" v-for="item in items" :key="item.id">
         <component
           :is="item.type"
@@ -102,7 +127,12 @@ function pickThisImage(img: { id: number; imageSrc: string; imageAlt: string }) 
           @move="move"
         />
       </div>
-      <div class="dropzone" @drop="onDrop($event)" @dragover.prevent @dragenter.prevent>
+      <div
+        class="dropzone mt-4"
+        @drop="onDrop($event, 'bottom')"
+        @dragover.prevent
+        @dragenter.prevent
+      >
         dropzone
       </div>
     </div>

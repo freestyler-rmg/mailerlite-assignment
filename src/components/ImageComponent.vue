@@ -42,7 +42,7 @@ function move(direction: 'up' | 'down') {
 }
 
 // CODE BLOCK - edit content
-const isEdit = ref(false);
+const isEdit = ref(true);
 
 function editContent() {
   isEdit.value = true;
@@ -57,7 +57,7 @@ function pickThisImage(item: { src: string; alt: string }) {
 <template>
   <div class="image-component">
     <div class="header">
-      <p class="text-xs">Component type: text</p>
+      <p class="text-xs">Component type: image</p>
       <div>
         <button class="bg-[#052e16]" @click="move('up')">⬆️</button>
         <button class="ml-1 bg-[#052e16]" @click="move('down')">⬇️</button>
