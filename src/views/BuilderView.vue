@@ -50,6 +50,21 @@ function duplicateItem(id: number) {
 function deleteItem(id: number) {
   items.value = items.value.filter((item) => item.id !== id);
 }
+
+// CODE BLOCK - move item
+function move(id: number, direction: 'up' | 'down') {
+  const index = items.value.findIndex((item) => item.id === id);
+  if (index === 0) return;
+
+  const item = items.value[index];
+  items.value.splice(index, 1);
+
+  if (direction === 'up') {
+    items.value.splice(index - 1, 0, item);
+  } else {
+    items.value.splice(index + 1, 0, item);
+  }
+}
 </script>
 
 <template>
@@ -69,8 +84,9 @@ function deleteItem(id: number) {
           :id="item.id"
           v-model="item.content"
           class="mb-3"
-          @duplicateItem="duplicateItem(item.id)"
-          @deleteItem="deleteItem(item.id)"
+          @duplicateItem="duplicateItem"
+          @deleteItem="deleteItem"
+          @move="move"
         />
       </div>
       <div class="dropzone" @drop="onDrop($event)" @dragover.prevent @dragenter.prevent>

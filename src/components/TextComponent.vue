@@ -11,9 +11,9 @@ const props = defineProps<{
 const emit = defineEmits<{
   duplicateItem: [id: number];
   deleteItem: [id: number];
-  moveUp: [id: number];
-  moveDown: [id: number];
+  move: [id: number, direction: 'up' | 'down'];
   updateContent: [{ id: number; content: string }];
+  testing: [id: number];
 }>();
 
 function duplicateItem() {
@@ -24,12 +24,8 @@ function deleteItem() {
   emit('deleteItem', props.id);
 }
 
-function moveUp() {
-  emit('moveUp', props.id);
-}
-
-function moveDown() {
-  emit('moveDown', props.id);
+function move(direction: 'up' | 'down') {
+  emit('move', props.id, direction);
 }
 
 // CODE BLOCK - edit content
@@ -50,8 +46,8 @@ onClickOutside(target, () => (isEdit.value = false));
     <div class="header">
       <p class="text-xs">Component type: text</p>
       <div>
-        <button class="bg-[#052e16]" @click="moveUp">⬆️</button>
-        <button class="ml-1 bg-[#052e16]" @click="moveDown">⬇️</button>
+        <button class="bg-[#052e16]" @click="move('up')">⬆️</button>
+        <button class="ml-1 bg-[#052e16]" @click="move('down')">⬇️</button>
         <button class="ml-1 bg-[#3b82f6]" @click="duplicateItem">duplicate</button>
         <button class="ml-1 bg-[#b91c1c]" @click="deleteItem">delete</button>
       </div>
