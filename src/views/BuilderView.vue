@@ -1,13 +1,24 @@
 <script setup lang="ts">
 import { ref, markRaw } from 'vue';
+import type { Item } from '@/types/item';
 import TextComponent from '@/components/TextComponent.vue';
 import ImageComponent from '@/components/ImageComponent.vue';
 
+// CODE BLOCK - init
 const components = {
   text: markRaw(TextComponent),
   image: markRaw(ImageComponent),
 };
 
+const items = ref<Item[]>([
+  {
+    id: 0,
+    type: markRaw(TextComponent),
+    content: 'Hello World',
+  },
+]);
+
+// CODE BLOCK - drag and drop
 function startDrag(evt, type) {
   console.log(evt);
   evt.dataTransfer.dropEffect = 'copy';
@@ -20,17 +31,14 @@ function onDrop(evt) {
   items.value.push({
     id: items.value.length,
     type: components[itemType],
-    content: 'New Component',
+    content: 'Hello World',
   });
 }
 
-const items = ref([
-  {
-    id: 0,
-    type: markRaw(TextComponent),
-    content: 'Hello World',
-  },
-]);
+// CODE BLOCK - delete
+function deleteItem(id) {
+  items.value = items.value.filter((item) => item.id !== id);
+}
 </script>
 
 <template>
@@ -45,7 +53,13 @@ const items = ref([
     </div>
     <div class="dropzone-container">
       <div class="content" v-for="item in items" :key="item.id">
-        <component :is="item.type" :content="item.content" />
+        <component
+          :is="item.type"
+          :id="item.id"
+          :content="item.content"
+          class="mb-3"
+          @deleteItem="deleteItem(item.id)"
+        />
       </div>
       <div class="dropzone" @drop="onDrop($event)" @dragover.prevent @dragenter.prevent>
         dropzone
