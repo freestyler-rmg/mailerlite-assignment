@@ -56,7 +56,7 @@ function deleteItem(id) {
         <component
           :is="item.type"
           :id="item.id"
-          :content="item.content"
+          v-model="item.content"
           class="mb-3"
           @deleteItem="deleteItem(item.id)"
         />

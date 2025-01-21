@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { ref, nextTick } from 'vue';
+import { onClickOutside } from '@vueuse/core';
+
+const content = defineModel({ type: String });
+
 const props = defineProps<{
-  content: string;
   id: number;
 }>();
 
@@ -9,6 +13,7 @@ const emit = defineEmits<{
   deleteItem: [id: number];
   moveUp: [id: number];
   moveDown: [id: number];
+  updateContent: [{ id: number; content: string }];
 }>();
 
 function duplicateItem() {
@@ -26,6 +31,18 @@ function moveUp() {
 function moveDown() {
   emit('moveDown', props.id);
 }
+
+// CODE BLOCK - edit content
+const isEdit = ref(false);
+const target = ref<HTMLInputElement | null>(null);
+
+async function editContent() {
+  isEdit.value = true;
+  await nextTick();
+  target.value?.focus();
+}
+
+onClickOutside(target, () => (isEdit.value = false));
 </script>
 
 <template>
@@ -40,7 +57,8 @@ function moveDown() {
       </div>
     </div>
     <div>
-      <p>{{ props.content }}</p>
+      <textarea ref="target" v-if="isEdit" v-model="content" class="w-full" />
+      <p v-else @click="editContent" class="whitespace-pre">{{ content }}</p>
     </div>
   </div>
 </template>
