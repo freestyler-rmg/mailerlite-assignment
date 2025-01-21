@@ -2,17 +2,21 @@
 import { ref } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 
+import imgRedPanda from '@/assets/pics/red-panda.jpg';
+import imgDog from '@/assets/pics/dog.jpg';
+import imgRiverOtter from '@/assets/pics/river-otter.jpg';
+
 const images = [
   {
-    src: '/src/assets/pics/red-panda.jpg',
+    src: imgRedPanda,
     alt: 'Red Panda',
   },
   {
-    src: '/src/assets/pics/dog.jpg',
+    src: imgDog,
     alt: 'Dog',
   },
   {
-    src: '/src/assets/pics/river-otter.jpg',
+    src: imgRiverOtter,
     alt: 'River Otter',
   },
 ];

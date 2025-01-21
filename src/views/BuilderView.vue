@@ -4,6 +4,8 @@ import type { Component } from 'vue';
 import type { Item } from '@/types/item';
 import TextComponent from '@/components/TextComponent.vue';
 import ImageComponent from '@/components/ImageComponent.vue';
+import imgRedPanda from '@/assets/pics/red-panda.jpg';
+import 'drag-drop-touch';
 
 // TODO: mobile view
 // TODO: more flexible dropzone
@@ -32,7 +34,7 @@ function onDrop(evt, position: 'top' | 'bottom') {
       type: components[itemType],
       isEdit: true,
       content: itemType === 'text' ? 'Hello World' : '',
-      imageSrc: itemType === 'image' ? '/src/assets/pics/red-panda.jpg' : '',
+      imageSrc: itemType === 'image' ? imgRedPanda : '',
       imageAlt: itemType === 'image' ? 'Red Panda' : '',
     });
   }
