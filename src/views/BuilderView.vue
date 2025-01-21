@@ -17,6 +17,12 @@ const items = ref<Item[]>([
     type: markRaw(TextComponent),
     content: 'Hello World',
   },
+  {
+    id: 1,
+    type: markRaw(ImageComponent),
+    imageSrc: '/src/assets/pics/red-panda.jpg',
+    imageAlt: 'Red Panda',
+  },
 ]);
 
 // CODE BLOCK - drag and drop
@@ -37,13 +43,10 @@ function onDrop(evt) {
 }
 
 // CODE BLOCK - duplicate
+// TODO: update this to accomodate image component and better logic
 function duplicateItem(id: number) {
   const item = items.value.find((item) => item.id === id);
-  items.value.push({
-    id: items.value.length,
-    type: item.type,
-    content: item.content,
-  });
+  items.value.push({ ...item, id: items.value.length });
 }
 
 // CODE BLOCK - delete
@@ -54,16 +57,23 @@ function deleteItem(id: number) {
 // CODE BLOCK - move item
 function move(id: number, direction: 'up' | 'down') {
   const index = items.value.findIndex((item) => item.id === id);
-  if (index === 0) return;
-
   const item = items.value[index];
   items.value.splice(index, 1);
 
-  if (direction === 'up') {
+  if (direction === 'up' && index > 0) {
     items.value.splice(index - 1, 0, item);
-  } else {
+  }
+
+  if (direction === 'down' && index < items.value.length) {
     items.value.splice(index + 1, 0, item);
   }
+}
+
+// CODE BLOCK - pick image
+function pickThisImage(img: { id: number; imageSrc: string; imageAlt: string }) {
+  const index = items.value.findIndex((item) => item.id === img.id);
+  items.value[index].imageSrc = img.imageSrc;
+  items.value[index].imageAlt = img.imageAlt;
 }
 </script>
 
@@ -83,7 +93,10 @@ function move(id: number, direction: 'up' | 'down') {
           :is="item.type"
           :id="item.id"
           v-model="item.content"
+          :image-src="item.imageSrc"
+          :image-alt="item.imageAlt"
           class="mb-3"
+          @pick-this-image="pickThisImage"
           @duplicateItem="duplicateItem"
           @deleteItem="deleteItem"
           @move="move"
