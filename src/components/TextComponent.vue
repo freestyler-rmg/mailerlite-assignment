@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, onMounted } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 
-const content = defineModel({ type: String });
+const content = defineModel('content', { type: String });
+const isEdit = defineModel('isEdit', { type: Boolean });
 
 const props = defineProps<{
   id: number;
@@ -29,7 +30,6 @@ function move(direction: 'up' | 'down') {
 }
 
 // CODE BLOCK - edit content
-const isEdit = ref(false);
 const target = ref<HTMLInputElement | null>(null);
 
 async function editContent() {
@@ -39,17 +39,21 @@ async function editContent() {
 }
 
 onClickOutside(target, () => (isEdit.value = false));
+
+onMounted(() => {
+  target.value?.focus();
+});
 </script>
 
 <template>
   <div class="text-component">
-    <div class="header">
+    <div class="component-header">
       <p class="text-xs">Component type: text</p>
       <div>
-        <button class="bg-[#052e16]" @click="move('up')">⬆️</button>
-        <button class="ml-1 bg-[#052e16]" @click="move('down')">⬇️</button>
-        <button class="ml-1 bg-[#3b82f6]" @click="duplicateItem">duplicate</button>
-        <button class="ml-1 bg-[#b91c1c]" @click="deleteItem">delete</button>
+        <button class="small-button bg-[#052e16]" @click="move('up')">⬆️</button>
+        <button class="small-button ml-1 bg-[#052e16]" @click="move('down')">⬇️</button>
+        <button class="small-button ml-1 bg-[#3b82f6]" @click="duplicateItem">duplicate</button>
+        <button class="small-button ml-1 bg-[#b91c1c]" @click="deleteItem">delete</button>
       </div>
     </div>
     <div>
@@ -61,19 +65,5 @@ onClickOutside(target, () => (isEdit.value = false));
 </template>
 
 <style lang="scss" scoped>
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 4px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid #eee;
-  button {
-    font-size: 10px;
-    padding: 4px;
-    border-radius: 4px;
-    color: #fff;
-    line-height: 1;
-  }
-}
+@use '@/assets/scss/component';
 </style>

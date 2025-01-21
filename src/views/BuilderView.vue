@@ -5,25 +5,16 @@ import type { Item } from '@/types/item';
 import TextComponent from '@/components/TextComponent.vue';
 import ImageComponent from '@/components/ImageComponent.vue';
 
+// TODO: mobile view
+// TODO: more flexible dropzone
+
 // CODE BLOCK - init
 const components = {
   text: markRaw(TextComponent),
   image: markRaw(ImageComponent),
 };
 
-const items = ref<Item[]>([
-  {
-    id: 0,
-    type: markRaw(TextComponent),
-    content: 'Hello World',
-  },
-  {
-    id: 1,
-    type: markRaw(ImageComponent),
-    imageSrc: '/src/assets/pics/red-panda.jpg',
-    imageAlt: 'Red Panda',
-  },
-]);
+const items = ref<Item[]>([]);
 
 // CODE BLOCK - drag and drop
 function startDrag(evt, type: Component) {
@@ -38,6 +29,7 @@ function onDrop(evt, position: 'top' | 'bottom') {
     items.value.unshift({
       id: items.value.length,
       type: components[itemType],
+      isEdit: true,
       content: itemType === 'text' ? 'Hello World' : '',
       imageSrc: itemType === 'image' ? '/src/assets/pics/red-panda.jpg' : '',
       imageAlt: itemType === 'image' ? 'Red Panda' : '',
@@ -48,9 +40,10 @@ function onDrop(evt, position: 'top' | 'bottom') {
     items.value.push({
       id: items.value.length,
       type: components[itemType],
-      content: itemType === 'text' ? 'Hello World' : '',
-      imageSrc: itemType === 'image' ? '/src/assets/pics/red-panda.jpg' : '',
-      imageAlt: itemType === 'image' ? 'Red Panda' : '',
+      isEdit: true,
+      content: itemType === 'text' ? 'Hello World' : undefined,
+      imageSrc: itemType === 'image' ? '/src/assets/pics/red-panda.jpg' : undefined,
+      imageAlt: itemType === 'image' ? 'Red Panda' : undefined,
     });
   }
 }
@@ -65,7 +58,7 @@ function duplicateItem(id: number) {
     }
   });
   if (itemIndex !== null) {
-    items.value.splice(itemIndex, 0, { ...item, id: items.value.length });
+    items.value.splice(itemIndex + 1, 0, { ...item, id: items.value.length, isEdit: false });
   }
 }
 
@@ -95,6 +88,21 @@ function pickThisImage(img: { id: number; imageSrc: string; imageAlt: string }) 
   items.value[index].imageSrc = img.imageSrc;
   items.value[index].imageAlt = img.imageAlt;
 }
+
+// CODE BLOCK - save to json
+function saveToJson() {
+  const forJson = items.value.map((item) => {
+    return {
+      id: item.id,
+      type: item.type.__name,
+      content: item.type.__name === 'TextComponent' ? item.content : undefined,
+      imageSrc: item.type.__name === 'ImageComponent' ? item.imageSrc : undefined,
+      imageAlt: item.type.__name === 'ImageComponent' ? item.imageAlt : undefined,
+    };
+  });
+
+  console.log(JSON.stringify(forJson));
+}
 </script>
 
 <template>
@@ -107,7 +115,9 @@ function pickThisImage(img: { id: number; imageSrc: string; imageAlt: string }) 
         <p>Image</p>
       </div>
       <hr />
-      <!-- TODO: save on json -->
+      <div>
+        <button class="small-button w-full bg-[#16a34a]" @click="saveToJson">Save</button>
+      </div>
     </div>
     <div class="dropzone-container">
       <div class="dropzone mb-4" @drop="onDrop($event, 'top')" @dragover.prevent @dragenter.prevent>
@@ -117,7 +127,8 @@ function pickThisImage(img: { id: number; imageSrc: string; imageAlt: string }) 
         <component
           :is="item.type"
           :id="item.id"
-          v-model="item.content"
+          v-model:content="item.content"
+          v-model:isEdit="item.isEdit"
           :image-src="item.imageSrc"
           :image-alt="item.imageAlt"
           class="mb-3"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { onClickOutside } from '@vueuse/core';
 
 const images = [
   {
@@ -42,7 +43,8 @@ function move(direction: 'up' | 'down') {
 }
 
 // CODE BLOCK - edit content
-const isEdit = ref(true);
+const target = ref<HTMLInputElement | null>(null);
+const isEdit = defineModel('isEdit', { type: Boolean });
 
 function editContent() {
   isEdit.value = true;
@@ -52,21 +54,23 @@ function pickThisImage(item: { src: string; alt: string }) {
   emit('pickThisImage', { id: props.id, imageSrc: item.src, imageAlt: item.alt });
   isEdit.value = false;
 }
+
+onClickOutside(target, () => (isEdit.value = false));
 </script>
 
 <template>
   <div class="image-component">
-    <div class="header">
+    <div class="component-header">
       <p class="text-xs">Component type: image</p>
       <div>
-        <button class="bg-[#052e16]" @click="move('up')">⬆️</button>
-        <button class="ml-1 bg-[#052e16]" @click="move('down')">⬇️</button>
-        <button class="ml-1 bg-[#3b82f6]" @click="duplicateItem">duplicate</button>
-        <button class="ml-1 bg-[#b91c1c]" @click="deleteItem">delete</button>
+        <button class="small-button bg-[#052e16]" @click="move('up')">⬆️</button>
+        <button class="small-button ml-1 bg-[#052e16]" @click="move('down')">⬇️</button>
+        <button class="small-button ml-1 bg-[#3b82f6]" @click="duplicateItem">duplicate</button>
+        <button class="small-button ml-1 bg-[#b91c1c]" @click="deleteItem">delete</button>
       </div>
     </div>
     <div>
-      <ul v-if="isEdit" class="image-list">
+      <ul ref="target" v-if="isEdit" class="image-list">
         <li v-for="img in images" :key="img.src" @click="pickThisImage(img)">
           <img :src="img.src" :alt="img.alt" />
         </li>
@@ -83,21 +87,7 @@ function pickThisImage(item: { src: string; alt: string }) {
 </template>
 
 <style lang="scss" scoped>
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 4px;
-  margin-bottom: 8px;
-  border-bottom: 1px solid #eee;
-  button {
-    font-size: 10px;
-    padding: 4px;
-    border-radius: 4px;
-    color: #fff;
-    line-height: 1;
-  }
-}
+@use '@/assets/scss/component';
 
 .image-list {
   display: flex;
