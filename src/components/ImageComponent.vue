@@ -81,7 +81,7 @@ onClickOutside(target, () => (isEdit.value = false));
       </ul>
       <img
         v-else
-        class="max-w-md cursor-pointer"
+        class="w-full md:max-w-md cursor-pointer"
         :src="imageSrc"
         :alt="imageAlt"
         @click="editContent"
