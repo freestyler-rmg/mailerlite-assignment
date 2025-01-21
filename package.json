@@ -10,7 +10,9 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "predeploy": "pnpm run build-only",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@vueuse/core": "^12.4.0",
