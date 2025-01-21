@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, markRaw } from 'vue';
+import type { Component } from 'vue';
 import type { Item } from '@/types/item';
 import TextComponent from '@/components/TextComponent.vue';
 import ImageComponent from '@/components/ImageComponent.vue';
@@ -19,7 +20,7 @@ const items = ref<Item[]>([
 ]);
 
 // CODE BLOCK - drag and drop
-function startDrag(evt, type) {
+function startDrag(evt, type: Component) {
   console.log(evt);
   evt.dataTransfer.dropEffect = 'copy';
   evt.dataTransfer.setData('type', type);
@@ -35,8 +36,18 @@ function onDrop(evt) {
   });
 }
 
+// CODE BLOCK - duplicate
+function duplicateItem(id: number) {
+  const item = items.value.find((item) => item.id === id);
+  items.value.push({
+    id: items.value.length,
+    type: item.type,
+    content: item.content,
+  });
+}
+
 // CODE BLOCK - delete
-function deleteItem(id) {
+function deleteItem(id: number) {
   items.value = items.value.filter((item) => item.id !== id);
 }
 </script>
@@ -58,6 +69,7 @@ function deleteItem(id) {
           :id="item.id"
           v-model="item.content"
           class="mb-3"
+          @duplicateItem="duplicateItem(item.id)"
           @deleteItem="deleteItem(item.id)"
         />
       </div>

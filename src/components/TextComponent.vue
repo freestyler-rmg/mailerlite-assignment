@@ -57,6 +57,7 @@ onClickOutside(target, () => (isEdit.value = false));
       </div>
     </div>
     <div>
+      <!-- TODO: change this into contenteditable -->
       <textarea ref="target" v-if="isEdit" v-model="content" class="w-full" />
       <p v-else @click="editContent" class="whitespace-pre">{{ content }}</p>
     </div>
